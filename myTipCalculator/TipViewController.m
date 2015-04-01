@@ -108,8 +108,15 @@
     float tipAmount = billAmount * [tipMultiplier[self.tipPercentageSegment.selectedSegmentIndex] floatValue];
     float totalAmount = tipAmount + billAmount;
     
-    self.tipAmountLabel.text = [NSString stringWithFormat:@"$%0.2f", tipAmount];
-    self.totalAmountLabel.text = [NSString stringWithFormat:@"$%0.2f", totalAmount];
+    //self.tipAmountLabel.text = [NSString stringWithFormat:@"$%0.2f", tipAmount];
+    //self.totalAmountLabel.text = [NSString stringWithFormat:@"$%0.2f", totalAmount];
+    
+    NSNumberFormatter *formatter = [[NSNumberFormatter alloc] init] ;
+    [formatter setNumberStyle:NSNumberFormatterCurrencyStyle];
+    [formatter setLocale:[NSLocale currentLocale]];
+    
+    self.tipAmountLabel.text = [formatter stringFromNumber:[NSNumber numberWithFloat:tipAmount]];
+    self.totalAmountLabel.text = [formatter stringFromNumber:[NSNumber numberWithFloat:totalAmount]];
     
     /* Store the time and billAmount everytime tipValue is calculated */
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
@@ -126,10 +133,6 @@
 
 -(void) onSettingsButton {
     [self.navigationController pushViewController:[[SettingsViewController alloc] init] animated:YES];
-}
-
-- (void)viewWillAppear:(BOOL)animated {
-    [self loadDefaultTipPercentage];
 }
 
 @end
