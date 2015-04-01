@@ -18,7 +18,8 @@
 - (IBAction)onTap:(id)sender;
 - (void) updateValues;
 - (void) onSettingsButton;
-- (void) updateTipPercentageSegment;
+- (void) loadDefaultTipPercentage;
+- (void) loadPreviousBillAmount;
 
 @end
 
@@ -33,7 +34,7 @@
     return self;
 }
 
-- (void) updateTipPercentageSegment {
+- (void) loadDefaultTipPercentage {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     
     if ( [defaults objectForKey:@"tipMultiplier"] == nil ) {
@@ -55,6 +56,24 @@
             [self.tipPercentageSegment setSelectedSegmentIndex:2];
             break;
     }
+    
+    
+}
+
+- (void) loadPreviousBillAmount {
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSDate *lastChanged = (NSDate*)[defaults objectForKey:@"lastUpdated"];
+    
+    if ( lastChanged != nil ) {
+        NSDate *now = [NSDate date];
+        
+        NSTimeInterval secs = [now timeIntervalSinceDate:lastChanged];
+        
+        if ( secs < 10*60 ) {
+            float lastBillAmount = [defaults floatForKey:@"lastBillAmount"];
+            [self.billAmountTextField setText:[NSString stringWithFormat:@"%0.2f", lastBillAmount]];
+        }
+    }
 
 }
 
@@ -63,8 +82,9 @@
     // Do any additional setup after loading the view from its nib.
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Settings" style:UIBarButtonItemStylePlain target:self action:@selector(onSettingsButton)];
     
-    [self updateTipPercentageSegment];
-
+    [self loadPreviousBillAmount];
+    [self loadDefaultTipPercentage];
+    [self updateValues];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -91,6 +111,11 @@
     self.tipAmountLabel.text = [NSString stringWithFormat:@"$%0.2f", tipAmount];
     self.totalAmountLabel.text = [NSString stringWithFormat:@"$%0.2f", totalAmount];
     
+    /* Store the time and billAmount everytime tipValue is calculated */
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    [defaults setFloat:billAmount forKey:@"lastBillAmount"];
+    [defaults setObject:[NSDate date] forKey:@"lastUpdated"];
+    
     [self.view endEditing:YES];
 }
 
@@ -104,7 +129,7 @@
 }
 
 - (void)viewWillAppear:(BOOL)animated {
-    [self updateTipPercentageSegment];
+    [self loadDefaultTipPercentage];
 }
 
 @end

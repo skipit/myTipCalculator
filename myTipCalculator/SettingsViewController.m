@@ -36,8 +36,7 @@
         case 20:
             [self.percentagePicker selectRow:2 inComponent:0 animated:YES];
             break;
-    }
-    
+    }    
 }
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
